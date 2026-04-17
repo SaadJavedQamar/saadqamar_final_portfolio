@@ -1571,28 +1571,28 @@
                 </div>
             </div>
             <div class="contact-form animate-on-scroll">
-                <form id="contactForm" onsubmit="handleSubmit(event)">
-                    <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" placeholder="Your Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <input type="text" id="subject" name="subject" placeholder="Job Opportunity / Collaboration" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Message</label>
-                        <textarea id="message" name="message" placeholder="Your message..." required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">
-                        <i class="fas fa-paper-plane"></i>
-                        Send Message
-                    </button>
-                </form>
+                <form action="https://formspree.io/f/maqaookd" method="POST" id="contactForm" onsubmit="handleSubmit(event)">
+    <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Your Name" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+    </div>
+    <div class="form-group">
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" placeholder="Job Opportunity / Collaboration" required>
+    </div>
+    <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Your message..." required></textarea>
+    </div>
+    <button type="submit" class="submit-btn">
+        <i class="fas fa-paper-plane"></i>
+        Send Message
+    </button>
+</form>
             </div>
         </div>
     </section>
@@ -1664,26 +1664,49 @@
         });
 
         // Form submission handler
-        function handleSubmit(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('.submit-btn');
-            const originalText = btn.innerHTML;
+        async function handleSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('.submit-btn');
+    const originalText = btn.innerHTML;
 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            btn.disabled = true;
+    // Visual Loading State
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    btn.disabled = true;
 
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
-                btn.style.background = 'var(--gradient-2)';
+    // Data collection
+    const formData = new FormData(form);
 
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '';
-                    btn.disabled = false;
-                    e.target.reset();
-                }, 2000);
-            }, 1500);
+    try {
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            // Success State
+            btn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+            btn.style.background = 'var(--gradient-2)';
+            form.reset(); // Form clear kar dega
+        } else {
+            throw new Error('Form submission failed');
         }
+    } catch (error) {
+        // Error State
+        btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Try Again';
+        btn.style.background = '#ff4b2b';
+    } finally {
+        // 3 seconds baad button wapis normal
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+            btn.disabled = false;
+        }, 3000);
+    }
+}
     </script>
 </body>
 </html>
